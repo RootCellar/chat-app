@@ -45,8 +45,16 @@ class SocketHandler(object):
 
     def read(self):
         try:
-            return self.socket.recv(512).decode("utf-8")
+            message =  self.socket.recv(512)
+            if len(message) < 1:
+                self.close()
+                return None
+            if message is not None:
+                return message.decode("utf-8")
         except BlockingIOError:
+            return None
+        except OSError:
+            self.close()
             return None
 
     def write(self, message):
