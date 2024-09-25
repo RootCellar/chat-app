@@ -15,6 +15,7 @@ class SocketHandler(object):
 
         if socket != None:
             self.socket = socket
+            self.socket.setblocking(0)
             self.connected = True
             self.host = host
             self.port = port
