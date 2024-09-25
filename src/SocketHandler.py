@@ -29,9 +29,14 @@ class SocketHandler(object):
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.socket.connect((self.host, self.port))
         self.socket.setblocking(0)
+        self.connected = True
+
+    def is_connected(self):
+        return self.connected
 
     def close(self):
         Debug.debug("Closing connection to " + str(self.host) + ":" + str(self.port) + "...")
+        self.connected = False
         try:
             self.socket.shutdown(1)
             self.socket.close()
