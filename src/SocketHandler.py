@@ -37,6 +37,9 @@ class SocketHandler(object):
     def close(self):
         Debug.debug("Closing connection to " + str(self.host) + ":" + str(self.port) + "...")
         self.connected = False
+        self.host = None
+        self.port = None
+
         try:
             self.socket.shutdown(1)
             self.socket.close()
