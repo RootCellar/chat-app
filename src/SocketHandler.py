@@ -72,6 +72,8 @@ class SocketHandler(object):
         except OSError:
             self.close()
 
+
+
 if __name__ == "__main__":
     sock = SocketHandler()
     sock.connect("localhost", 45000)
