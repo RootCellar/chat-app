@@ -66,4 +66,4 @@ if __name__ == "__main__":
 
         message = client.read()
         if message is not None:
-            print(message)
+            print(message.replace("\n",""))
