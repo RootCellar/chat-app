@@ -46,7 +46,11 @@ class SocketHandler(object):
         except OSError:
             pass
 
+        self.socket = None
+
     def read(self):
+        if self.socket is None:
+            return None
         try:
             message = self.socket.recv(512)
             if len(message) < 1:
@@ -61,6 +65,8 @@ class SocketHandler(object):
             return None
 
     def write(self, message):
+        if self.socket is None:
+            return
         try:
             self.socket.send(message.encode("utf-8"))
         except OSError:
