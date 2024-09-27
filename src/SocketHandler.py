@@ -48,7 +48,7 @@ class SocketHandler(object):
 
     def read(self):
         try:
-            message =  self.socket.recv(512)
+            message = self.socket.recv(512)
             if len(message) < 1:
                 self.close()
                 return None
