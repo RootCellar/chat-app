@@ -27,11 +27,15 @@ class ChatServer(object):
 
             message = client.read()
             if message is not None:
+                message = message.replace("\n", "")
                 self.broadcast_message("Client: " + message)
 
     def broadcast_message(self, message):
+        print("Broadcast: " + message)
         for client in self.clients:
-            client.write(message)
+            client.write(message + "\n")
+
+
 
 if __name__ == "__main__":
     server = ChatServer()
