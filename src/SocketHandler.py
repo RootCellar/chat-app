@@ -3,6 +3,7 @@ import socket
 import time
 
 import Debug
+import InetMessage
 
 class SocketHandler(object):
 
@@ -11,6 +12,7 @@ class SocketHandler(object):
         self.port = None
 
         self.socket = None
+        self.buffer = b''
         self.connected = False
 
         if socket != None:
@@ -56,19 +58,23 @@ class SocketHandler(object):
             if len(message) < 1:
                 self.close()
                 return None
-            if message is not None:
-                return message.decode("utf-8")
+            elif message is not None:
+                self.buffer = self.buffer + message
+                inetMessage = InetMessage.message_from_bytes(self.buffer)
+                if inetMessage is not None:
+                    self.buffer = self.buffer[inetMessage.get_len():]
+                    return inetMessage
         except BlockingIOError:
             return None
         except OSError:
             self.close()
             return None
 
-    def write(self, message):
+    def write(self, code, message):
         if self.socket is None:
             return
         try:
-            self.socket.send(message.encode("utf-8"))
+            self.socket.send(InetMessage.message_to_bytes(code, message))
         except OSError:
             self.close()
 

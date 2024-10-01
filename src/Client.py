@@ -1,5 +1,8 @@
 
+import tkinter
+
 import SocketHandler
+import InetMessage
 import time
 
 class Client(object):
@@ -42,7 +45,7 @@ class Client(object):
     def write(self, message):
         if self.is_connected() is False:
             return
-        self.socket.write(message)
+        self.socket.write(0, message)
 
 
 
@@ -64,6 +67,10 @@ if __name__ == "__main__":
             print("Disconnected from server")
             exit(0)
 
-        message = client.read()
-        if message is not None:
-            print(message.replace("\n",""))
+        inetMessage = client.read()
+        if inetMessage is not None:
+            code = inetMessage.get_code()
+            message = inetMessage.get_message()
+            if code == 0:
+                message = message.decode("utf-8")
+                print(message.replace("\n", ""))

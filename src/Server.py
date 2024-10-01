@@ -25,15 +25,17 @@ class ChatServer(object):
                 self.clients.remove(client)
                 continue
 
-            message = client.read()
-            if message is not None:
-                message = message.replace("\n", "")
-                self.broadcast_message("Client: " + message)
+            inetMessage = client.read()
+            if inetMessage is not None:
+                if inetMessage.get_code() == 0:
+                    message = inetMessage.get_message().decode("utf-8")
+                    message = message.replace("\n", "")
+                    self.broadcast_message("Client: " + message)
 
     def broadcast_message(self, message):
         print("Broadcast: " + message)
         for client in self.clients:
-            client.write(message + "\n")
+            client.write(0, message + "\n")
 
 
 
