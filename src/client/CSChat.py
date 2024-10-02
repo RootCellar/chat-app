@@ -8,127 +8,152 @@
 #                                     Library Imports                                        #
 ##############################################################################################
 
+from .Client import Client
+
 import tkinter as tk
 from tkinter import simpledialog, font
 
-##############################################################################################
-#                           class CSChat - Main for Tkinter GUI                              #
-##############################################################################################
+class ChatConnection:
+    client = Client()
+    username = None
+    def __init__(self, server_address, username):
+        self.username = username
+        connected = self.client.connect(server_address, 45000)
+        if connected is False:
+            print("Could not connect to server!")
+    def get_next_message(self):
+        # returns connection
+        if self.client.is_connected() == False:
+            return { 'username': 'system', 'text': 'Disconnected from server' }
+        inetMessage = self.client.read()
+        if inetMessage is not None:
+            code = inetMessage.get_code()
+            message = inetMessage.get_message()
+            if code == 0:
+                message = message.decode("utf-8").replace("\n", "")
+                return { 'username': 'Other User', 'text': message }
 
-class CSChat:
-    # Initialize the Tkinter GUI application.
-    def __init__(self, root):
-        self.root = root
-        self.root.title("CSChat")
-        self.root.geometry("1920x1080")  
-        self.root.resizable(True, True)  
+def append_chat_history(chat_history_frame, message):
+    if message:
+        # Append the message to the chat display.
+        chat_history_frame.config(state=tk.NORMAL)
+        chat_history_frame.insert(tk.END, f"{ message['username'] }: { message['text'] }\n")
+        chat_history_frame.config(state=tk.DISABLED)
 
-        # Initialize the application's welcome window.
-        self.welcomeWindow = tk.Frame(root)
-        self.welcomeWindow.grid(row=0, column=0, sticky="nsew")
-        self.root.grid_rowconfigure(0, weight=1)
-        self.root.grid_columnconfigure(0, weight=1)
-        self.welcomeWindow.grid_rowconfigure(0, weight=1)
-        self.welcomeWindow.grid_rowconfigure(2, weight=1)
-        self.welcomeWindow.grid_columnconfigure(0, weight=1)
+        # Scroll to the end of the chat display.
+        chat_history_frame.yview(tk.END)
 
-        # Initialize the title - "Welcome to CSChat" on the application's welcome window.
-        self.title = tk.Label(self.welcomeWindow, text="Welcome to CSChat", font=("Arial", 24))
-        self.title.grid(row=0, column=0, pady=100)
 
-        # Initialize the join button on the application's welcome window.
-        self.join = tk.Button(self.welcomeWindow, text="Join", font=("Arial", 16), command=self.askUsername)
-        self.join.grid(row=1, column=0)  # Directly below the title label
+def display_chat(root, connection):
+    # Initalize the chatbox for the chatroom.
+    chatBox = tk.Frame(root)
+    chatBox.grid(row=1, column=0, sticky="nsew")
+    chatBox.grid_rowconfigure(0, weight=1)
+    chatBox.grid_columnconfigure(0, weight=1)
 
-    ##########################################################################################
-    #            Function askUsername() - Dialog window prompting for a username.            #
-    ##########################################################################################
+    # Configure grid.
+    root.grid_rowconfigure(1, weight=1)
+    root.grid_columnconfigure(0, weight=1)
 
-    def askUsername(self):
-        # Configure default font for dialog.
-        default_font = font.nametofont("TkDefaultFont")
-        default_font.configure(size=15)  # Set the size to 16 or any suitable size
+    # Intialize text widget to display chat messages.
+    chatDisplay = tk.Text(chatBox, state=tk.DISABLED, wrap=tk.WORD)
+    chatDisplay.grid(row=0, column=0, sticky="nsew")
 
-        # Ask the user for a username.
-        self.username = simpledialog.askstring("Username", "Enter your username:")
+    # Initialize the chatbox's scroll bar.
+    scrollBar = tk.Scrollbar(chatBox, command=chatDisplay.yview)
+    scrollBar.grid(row=0, column=1, sticky="ne")
+    chatDisplay.config(yscrollcommand=scrollBar.set)
 
-        if self.username:
-            # If username is entered, hide the welcome frame and show the chatroom.
-            self.welcomeWindow.grid_remove()  
-            self.createRoom()
+    # Initialize the message entry box for the chatroom.
+    messageEntry = tk.Entry(root)
+    messageEntry.grid(row=2, column=0, sticky="ew")
 
-        # Reset the font size to default after dialog is closed.
-        default_font.configure(size=12)  
-
-    ##########################################################################################
-    #                   Function createRoom() - Window for the chatroom.                     #
-    ##########################################################################################
-
-    def createRoom(self):
-        # Initalize the chatbox for the chatroom.
-        self.chatBox = tk.Frame(self.root)
-        self.chatBox.grid(row=1, column=0, sticky="nsew")
-        self.chatBox.grid_rowconfigure(0, weight=1)
-        self.chatBox.grid_columnconfigure(0, weight=1)
-
-        # Configure grid.
-        self.root.grid_rowconfigure(1, weight=1)
-        self.root.grid_columnconfigure(0, weight=1)
-
-        # Intialize text widget to display chat messages.
-        self.chatDisplay = tk.Text(self.chatBox, font=("Arial", 14), state=tk.DISABLED, wrap=tk.WORD)
-        self.chatDisplay.grid(row=0, column=0, sticky="nsew")
-
-        # Initialize the chatbox's scroll bar.
-        self.scrollBar = tk.Scrollbar(self.chatBox, command=self.chatDisplay.yview)
-        self.scrollBar.grid(row=0, column=1, sticky="ne")
-        self.chatDisplay.config(yscrollcommand=self.scrollBar.set)
-
-        # Initialize the message entry box for the chatroom.
-        self.messageEntry = tk.Entry(self.root, font=("Arial", 14))
-        self.messageEntry.grid(row=2, column=0, sticky="ew")
-
-        # Initialize the button to send messages.
-        self.messageSend = tk.Button(self.root, text="Send", font=("Arial", 14), command=self.sendMessage)
-        self.messageSend.grid(row=3, column=0, sticky="ew")
-
-        # Extend chatbox to fit.
-        self.chatBox.grid_rowconfigure(0, weight=1)
-        self.chatBox.grid_columnconfigure(0, weight=1)
-
-    ##########################################################################################
-    #        Function enterMessage() - Inserts user input into the message entry box.        #
-    ##########################################################################################
-
-    def enterMessage(self, symbol):
-        # Insert the selected symbol into the message entry
-        self.messageEntry.insert(tk.END, symbol)
-
-    ##########################################################################################
-    #           Function sendMessage() - Sends message input to the chat display.            #
-    ##########################################################################################
-
-    def sendMessage(self):
-        # Get the message from the message entry box.
-        message = self.messageEntry.get()
-
-        if message:
-            # Append the message to the chat display.
-            self.chatDisplay.config(state=tk.NORMAL)
-            self.chatDisplay.insert(tk.END, f"{self.username}: {message}\n")
-            self.chatDisplay.config(state=tk.DISABLED)
-
-            # Scroll to the end of the chat display.
-            self.chatDisplay.yview(tk.END)
-
+    def send_my_message():
+        if messageEntry.get():
+            append_chat_history(chatDisplay, { 'username': connection.username, 'text': messageEntry.get() })
+            connection.client.write(messageEntry.get())
             # Clear the message entry box after sending the message.
-            self.messageEntry.delete(0, tk.END)
+            messageEntry.delete(0, tk.END)
+
+    # Initialize the button to send messages.
+    messageSend = tk.Button(root, text="Send", command=send_my_message)
+    messageSend.grid(row=3, column=0, sticky="ew")
+
+    # Extend chatbox to fit.
+    chatBox.grid_rowconfigure(0, weight=1)
+    chatBox.grid_columnconfigure(0, weight=1)
+
+    def get_incoming_message_loop():
+        append_chat_history(chatDisplay, connection.get_next_message())
+        if connection.client.is_connected() is False:
+            print('Client disconnected, return to join screen')
+        root.after(100, get_incoming_message_loop)
+    get_incoming_message_loop()
+
+def display_join(root):
+    # Initialize the application's welcome window.
+    welcome_window = tk.Frame(root)
+    welcome_window.grid(row=0, column=0, sticky="nsew")
+    root.grid_rowconfigure(0, weight=1)
+    root.grid_columnconfigure(0, weight=1)
+    welcome_window.grid_rowconfigure(0, weight=1)
+    welcome_window.grid_rowconfigure(1, weight=3)
+    welcome_window.grid_rowconfigure(2, weight=1)
+    welcome_window.grid_columnconfigure(0, weight=1)
+
+    # Initialize the title - "Welcome to CSChat" on the application's welcome window.
+    title = tk.Label(welcome_window, text="Welcome to CSChat", font=("Arial", 24))
+    title.grid(row=0, column=0)
+    title.place(relx=0.5, rely=0.1, anchor=tk.CENTER)
+
+    join_input_frame = tk.Frame(welcome_window)
+    join_input_frame.grid(row=1, column=0, sticky="ew", padx=80)
+    join_input_frame.grid_rowconfigure(0, weight=1)
+    join_input_frame.grid_columnconfigure(0, weight=1)
+    join_input_frame.grid_columnconfigure(1, weight=5)
+
+    # Ask the user for server address.
+    server_address_label = tk.Label(join_input_frame, text = 'Server:')
+    server_address_label.grid(row=0, column=0)
+    server_address = tk.Entry(join_input_frame)
+    server_address.grid(row=0, column=1, sticky="ew", pady=5)
+    server_address.insert(0, 'localhost')
+
+    # Ask the user for username.
+    username_label = tk.Label(join_input_frame, text = 'Username:')
+    username_label.grid(row=1, column=0)
+    username = tk.Entry(join_input_frame)
+    username.grid(row=1, column=1, sticky="ew")
+    username.insert(0, 'asdf')
+
+    def join_server(server_address, username):
+        def callback():
+            if server_address.get() and username.get():
+                welcome_window.grid_remove()
+                connection = ChatConnection(server_address.get(), username.get())
+                display_chat(root, connection)
+        return callback
+
+    # Initialize the join button on the application's welcome window.
+    join_button = tk.Button(welcome_window, text="Join", command=join_server(server_address, username))
+    join_button.grid(row=2, column=0, sticky='n', pady=1)  # Directly below the title label
+
+def init(root):
+    display_join(root)
 
 if __name__ == "__main__":
     root = tk.Tk()
-    app = CSChat(root)
+    root.title("CSChat")
+    font.nametofont("TkDefaultFont").configure(
+        family="Arial",
+        size=14
+    )
+    font.nametofont("TkTextFont").configure(
+        family="Arial",
+        size=14
+    )
+    root.geometry("640x480")
+    root.resizable(True, True)
+    root.eval('tk::PlaceWindow . center')
+    init(root)
     root.mainloop()
-
-##############################################################################################
-#                                                                                            #
-##############################################################################################

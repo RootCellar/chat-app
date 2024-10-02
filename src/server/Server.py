@@ -29,7 +29,7 @@ class ChatServer(object):
                 if inetMessage.get_code() == 0:
                     message = inetMessage.get_message().decode("utf-8")
                     message = message.replace("\n", "")
-                    self.broadcast_message("Client: " + message)
+                    self.broadcast_message(message)
 
     def broadcast_message(self, message):
         print("Broadcast: " + message)
