@@ -1,6 +1,5 @@
-
-import SocketHandler
-import ServerSocket
+from ..lib import SocketHandler
+from ..lib import ServerSocket
 
 import time
 

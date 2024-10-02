@@ -2,8 +2,8 @@
 import socket
 import time
 
-import Debug
-import SocketHandler
+from . import Debug
+from . import SocketHandler
 
 class ServerSocket(object):
 
