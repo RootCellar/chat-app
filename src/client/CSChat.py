@@ -21,6 +21,10 @@ class ChatConnection:
         connected = self.client.connect(server_address, 45000)
         if connected is False:
             print("Could not connect to server!")
+            return
+
+        self.client.write(1, self.username)
+
     def get_next_message(self):
         # returns connection
         if self.client.is_connected() == False:
