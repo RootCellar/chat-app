@@ -127,7 +127,7 @@ def display_join(root):
     username_label.grid(row=1, column=0)
     username = tk.Entry(join_input_frame)
     username.grid(row=1, column=1, sticky="ew")
-    username.insert(0, 'asdf')
+    username.insert(0, 'Guest')
 
     def join_server(server_address, username):
         def callback():
