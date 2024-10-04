@@ -26,22 +26,13 @@ class ChatConnection:
         self.client.write(1, self.username)
 
     def get_next_message(self):
-        # returns connection
-        if self.client.is_connected() == False:
-            return { 'username': 'system', 'text': 'Disconnected from server' }
-        inetMessage = self.client.read()
-        if inetMessage is not None:
-            code = inetMessage.get_code()
-            message = inetMessage.get_message()
-            if code == 0:
-                message = message.decode("utf-8").replace("\n", "")
-                return { 'username': 'Other User', 'text': message }
+        return self.client.read()
 
 def append_chat_history(chat_history_frame, message):
     if message:
         # Append the message to the chat display.
         chat_history_frame.config(state=tk.NORMAL)
-        chat_history_frame.insert(tk.END, f"{ message['username'] }: { message['text'] }\n")
+        chat_history_frame.insert(tk.END, message + "\n")
         chat_history_frame.config(state=tk.DISABLED)
 
         # Scroll to the end of the chat display.
@@ -74,8 +65,8 @@ def display_chat(root, connection):
 
     def send_my_message():
         if messageEntry.get():
-            append_chat_history(chatDisplay, { 'username': connection.username, 'text': messageEntry.get() })
-            connection.client.write(messageEntry.get())
+            append_chat_history(chatDisplay, "> " + messageEntry.get())
+            connection.client.chat(messageEntry.get())
             # Clear the message entry box after sending the message.
             messageEntry.delete(0, tk.END)
 
@@ -88,10 +79,18 @@ def display_chat(root, connection):
     chatBox.grid_columnconfigure(0, weight=1)
 
     def get_incoming_message_loop():
-        append_chat_history(chatDisplay, connection.get_next_message())
         if connection.client.is_connected() is False:
-            print('Client disconnected, return to join screen')
+            print('Client disconnected')
+            exit(0)
+
+        message = connection.get_next_message()
+        if message is not None:
+            if message.get_code() == 0:
+                message = message.get_message().decode("utf-8").replace("\n", "")
+                append_chat_history(chatDisplay, "# " + message)
+
         root.after(100, get_incoming_message_loop)
+
     get_incoming_message_loop()
 
 def display_join(root):
