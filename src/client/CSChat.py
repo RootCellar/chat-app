@@ -70,6 +70,11 @@ def display_chat(root, connection):
             # Clear the message entry box after sending the message.
             messageEntry.delete(0, tk.END)
 
+    def enter_key_press_event(event):
+        send_my_message()
+
+    messageEntry.bind('<Return>', enter_key_press_event)
+
     # Initialize the button to send messages.
     messageSend = tk.Button(root, text="Send", command=send_my_message)
     messageSend.grid(row=3, column=0, sticky="ew")
