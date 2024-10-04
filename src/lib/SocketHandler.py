@@ -2,8 +2,8 @@
 import socket
 import time
 
-import Debug
-import InetMessage
+from . import Debug
+from . import InetMessage
 
 class SocketHandler(object):
 

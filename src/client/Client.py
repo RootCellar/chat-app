@@ -1,8 +1,8 @@
 
 import tkinter
 
-import SocketHandler
-import InetMessage
+from ..lib import SocketHandler
+from ..lib import InetMessage
 import time
 
 class Client(object):
