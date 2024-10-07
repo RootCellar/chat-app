@@ -42,12 +42,15 @@ class Client(object):
             return None
         return self.socket.read()
 
-    def write(self, message):
+    def chat(self, message):
         if self.is_connected() is False:
             return
         self.socket.write(0, message)
 
-
+    def write(self, code, message):
+        if self.is_connected() is False:
+            return
+        self.socket.write(code, message)
 
 if __name__ == "__main__":
     client = Client()
@@ -57,7 +60,7 @@ if __name__ == "__main__":
         print("Could not connect to server!")
         exit(1)
 
-    client.write("Hi")
+    client.chat("Hi")
 
     while True:
 

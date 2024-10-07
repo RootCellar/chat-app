@@ -1,6 +1,8 @@
 from ..lib import SocketHandler
 from ..lib import ServerSocket
 
+from . import User
+
 import time
 
 class ChatServer(object):
@@ -14,7 +16,8 @@ class ChatServer(object):
     def accept_client(self):
         socket = self.serv.accept()
         if socket is not None:
-            self.clients.append(socket)
+            client = User.User(socket)
+            self.clients.append(client)
         return socket
 
     def handle_messages(self):
@@ -29,12 +32,16 @@ class ChatServer(object):
                 if inetMessage.get_code() == 0:
                     message = inetMessage.get_message().decode("utf-8")
                     message = message.replace("\n", "")
-                    self.broadcast_message(message)
+                    self.broadcast_message(client.username + ": " + message)
+                elif inetMessage.get_code() == 1:
+                    message = inetMessage.get_message().decode("utf-8")
+                    print("Client name change to " + message)
+                    client.username = message
 
     def broadcast_message(self, message):
         print("Broadcast: " + message)
         for client in self.clients:
-            client.write(0, message + "\n")
+            client.send(0, message + "\n")
 
 
 
