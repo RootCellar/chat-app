@@ -93,7 +93,7 @@ def display_chat(root, connection):
 
         message = connection.get_next_message()
         if message is not None:
-            if message.get_code() == 0:
+            if message.get_code() == MessageType.CHAT_MESSAGE.value:
                 message = message.get_message().decode("utf-8").replace("\n", "")
                 append_chat_history(chatDisplay, "# " + message)
 
