@@ -60,7 +60,8 @@ class ChatServer(object):
     def broadcast_message(self, message):
         self.log("Broadcast: " + message)
         for client in self.clients:
-            client.send(MessageType.CHAT_MESSAGE.value, message + "\n")
+            if client.state == ConnectionState.CHATTING:
+                client.send(MessageType.CHAT_MESSAGE.value, message + "\n")
 
 
 
