@@ -22,11 +22,14 @@ class SocketHandler(object):
             self.host = host
             self.port = port
 
+    def log(self, output):
+        Debug.debug("[SOCKET HANDLER]" + output)
+
     def connect(self, host, port):
         self.host = host
         self.port = port
 
-        Debug.debug("Connecting to " + str(self.host) + ":" + str(self.port) + "...")
+        self.log("Connecting to " + str(self.host) + ":" + str(self.port) + "...")
 
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.socket.connect((self.host, self.port))
@@ -37,7 +40,7 @@ class SocketHandler(object):
         return self.connected
 
     def close(self):
-        Debug.debug("Closing connection to " + str(self.host) + ":" + str(self.port) + "...")
+        self.log("Closing connection to " + str(self.host) + ":" + str(self.port) + "...")
         self.connected = False
         self.host = None
         self.port = None
