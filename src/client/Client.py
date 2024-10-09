@@ -17,10 +17,15 @@ class Client(object):
         self.serverport = None
         self.socket = None
         self.state = None
+
+        self.username = None
         self.server_state = None
 
     def log(self, output):
         debug("[CLIENT] " + output)
+
+    def set_username(self, username):
+        self.username = username
 
     def connect(self, host, port):
         self.socket = SocketHandler.SocketHandler()
@@ -75,6 +80,10 @@ class Client(object):
                 return None
             self.server_state = int.from_bytes(data, byteorder='big')
             self.log("CONN_STATE: " + str(self.server_state))
+
+            if self.server_state == ConnectionState.SEND_USERNAME.value:
+                self.log("Server needs username. Sending username to server...")
+                self.write(MessageType.USERNAME.value, self.username)
 
         return None
 

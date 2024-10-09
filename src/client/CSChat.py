@@ -21,12 +21,11 @@ class ChatConnection:
     username = None
     def __init__(self, server_address, username, port=45000):
         self.username = username
+        self.client.set_username(username)
         connected = self.client.connect(server_address, port)
         if connected is False:
             print("Could not connect to server!")
             return
-
-        self.client.write(MessageType.USERNAME.value, self.username)
 
     def get_next_message(self):
         return self.client.read()
