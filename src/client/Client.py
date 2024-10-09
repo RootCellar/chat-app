@@ -3,7 +3,12 @@ import tkinter
 
 from ..lib import SocketHandler
 from ..lib import InetMessage
+from ..lib.Debug import debug
+
 import time
+
+from ..lib.MessageType import MessageType
+from ..lib.ConnectionState import ConnectionState
 
 class Client(object):
 
@@ -11,6 +16,11 @@ class Client(object):
         self.serverhost = None
         self.serverport = None
         self.socket = None
+        self.state = None
+        self.server_state = None
+
+    def log(self, output):
+        debug("[CLIENT] " + output)
 
     def connect(self, host, port):
         self.socket = SocketHandler.SocketHandler()
@@ -23,6 +33,8 @@ class Client(object):
 
         self.serverhost = host
         self.serverport = port
+        self.state = ConnectionState.INITIATED
+        self.server_state = None
         return True
 
     def disconnect(self):
@@ -31,6 +43,8 @@ class Client(object):
 
         self.serverhost = None
         self.serverport = None
+        self.state = None
+        self.server_state = None
 
     def is_connected(self):
         if self.socket is None:
@@ -40,12 +54,34 @@ class Client(object):
     def read(self):
         if self.is_connected() is False:
             return None
-        return self.socket.read()
+        if self.socket.is_connected() is False:
+            self.disconnect()
+            return None
+
+        message = self.socket.read()
+
+        if message is None:
+            return None
+
+        self.log("Received message with code " + str(message.get_code()))
+        if message.get_code() == MessageType.CHAT_MESSAGE.value:
+            return message
+        elif message.get_code() == MessageType.CONN_STATE.value:
+            data = message.get_message()
+            if len(data) != 4:
+                # Protocol error
+                self.log("Server sent wrong number of bytes for CONN_STATE")
+                self.disconnect()
+                return None
+            self.server_state = int.from_bytes(data, byteorder='big')
+            self.log("CONN_STATE: " + str(self.server_state))
+
+        return None
 
     def chat(self, message):
         if self.is_connected() is False:
             return
-        self.socket.write(0, message)
+        self.socket.write(MessageType.CHAT_MESSAGE.value, message)
 
     def write(self, code, message):
         if self.is_connected() is False:
