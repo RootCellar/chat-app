@@ -46,7 +46,10 @@ class ChatServer(object):
 
 
 if __name__ == "__main__":
-    server = ChatServer()
+    port = 45000
+    if len(sys.argv) == 2:
+        port = int(sys.argv[1])
+    server = ChatServer(port)
     while True:
         time.sleep(0.1)
         server.handle_messages()
