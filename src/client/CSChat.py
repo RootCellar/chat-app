@@ -10,6 +10,9 @@
 
 from .Client import Client
 
+from ..lib.MessageType import MessageType
+from ..lib.ConnectionState import ConnectionState
+
 import tkinter as tk
 from tkinter import simpledialog, font
 
@@ -23,7 +26,7 @@ class ChatConnection:
             print("Could not connect to server!")
             return
 
-        self.client.write(1, self.username)
+        self.client.write(MessageType.USERNAME.value, self.username)
 
     def get_next_message(self):
         return self.client.read()
