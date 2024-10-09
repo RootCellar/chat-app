@@ -26,7 +26,7 @@ class ChatServer(object):
         socket = self.serv.accept()
         if socket is not None:
             client = User.User(socket)
-            client.state = ConnectionState.SEND_USERNAME
+            self.change_state(client, ConnectionState.SEND_USERNAME)
             self.clients.append(client)
         return socket
 
