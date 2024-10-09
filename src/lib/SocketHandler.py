@@ -60,15 +60,16 @@ class SocketHandler(object):
                 return None
             elif message is not None:
                 self.buffer = self.buffer + message
-                inetMessage = InetMessage.message_from_bytes(self.buffer)
-                if inetMessage is not None:
-                    self.buffer = self.buffer[inetMessage.get_len():]
-                    return inetMessage
         except BlockingIOError:
-            return None
+            pass
         except OSError:
             self.close()
-            return None
+
+        inetMessage = InetMessage.message_from_bytes(self.buffer)
+        if inetMessage is not None:
+            self.buffer = self.buffer[inetMessage.get_len():]
+            return inetMessage
+        return None
 
     def write(self, code, message):
         if self.socket is None:
