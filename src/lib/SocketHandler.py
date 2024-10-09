@@ -68,6 +68,10 @@ class SocketHandler(object):
         except OSError:
             self.close()
 
+        if len(self.buffer) > 16384:
+            self.log("Read buffer overflow")
+            self.close()
+
         inetMessage = InetMessage.message_from_bytes(self.buffer)
         if inetMessage is not None:
             self.buffer = self.buffer[inetMessage.get_len():]
