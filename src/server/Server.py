@@ -38,8 +38,9 @@ class ChatServer(object):
     def handle_messages(self):
         for client in self.clients:
             if client.is_connected() is False:
-                self.broadcast_message("Client Disconnected")
                 self.clients.remove(client)
+                if client.state == ConnectionState.CHATTING:
+                    self.broadcast_message(client.username + " left the chat")
                 continue
 
             inetMessage = client.read()
