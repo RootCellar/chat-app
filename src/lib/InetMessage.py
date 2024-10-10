@@ -1,4 +1,6 @@
 
+from enum import Enum
+
 def message_len(bytes):
     if type(bytes) is not bytes:
         raise RuntimeError
@@ -33,6 +35,8 @@ def message_from_bytes(data):
 def message_to_bytes(code, data):
     if type(data) is str:
         message_bytes = data.encode("utf-8")
+    elif type(data) is int:
+        message_bytes = int.to_bytes(data, length=4, byteorder='big')
     else:
         raise NotImplementedError
 
