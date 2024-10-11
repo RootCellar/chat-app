@@ -10,20 +10,22 @@
 
 from .Client import Client
 
+from ..lib.MessageType import MessageType
+from ..lib.ConnectionState import ConnectionState
+
 import tkinter as tk
 from tkinter import simpledialog, font
 
 class ChatConnection:
     client = Client()
     username = None
-    def __init__(self, server_address, username):
+    def __init__(self, server_address, username, port=45000):
         self.username = username
-        connected = self.client.connect(server_address, 45000)
+        self.client.set_username(username)
+        connected = self.client.connect(server_address, port)
         if connected is False:
             print("Could not connect to server!")
             return
-
-        self.client.write(1, self.username)
 
     def get_next_message(self):
         return self.client.read()
@@ -90,7 +92,7 @@ def display_chat(root, connection):
 
         message = connection.get_next_message()
         if message is not None:
-            if message.get_code() == 0:
+            if message.get_code() == MessageType.CHAT_MESSAGE.value:
                 message = message.get_message().decode("utf-8").replace("\n", "")
                 append_chat_history(chatDisplay, "# " + message)
 
@@ -127,18 +129,25 @@ def display_join(root):
     server_address.grid(row=0, column=1, sticky="ew", pady=5)
     server_address.insert(0, 'localhost')
 
+    # Ask the user for server port.
+    server_port_label = tk.Label(join_input_frame, text = 'Port:')
+    server_port_label.grid(row = 1, column = 0)
+    server_port = tk.Entry(join_input_frame)
+    server_port.grid(row = 1, column = 1, sticky = "ew", pady = 5)
+    server_port.insert(0, '45000')
+
     # Ask the user for username.
     username_label = tk.Label(join_input_frame, text = 'Username:')
-    username_label.grid(row=1, column=0)
+    username_label.grid(row=2, column=0)
     username = tk.Entry(join_input_frame)
-    username.grid(row=1, column=1, sticky="ew")
+    username.grid(row=2, column=1, sticky="ew")
     username.insert(0, 'Guest')
 
     def join_server(server_address, username):
         def callback():
-            if server_address.get() and username.get():
+            if server_address.get() and username.get() and server_port.get():
                 welcome_window.grid_remove()
-                connection = ChatConnection(server_address.get(), username.get())
+                connection = ChatConnection(server_address.get(), username.get(), port=int(server_port.get()))
                 display_chat(root, connection)
         return callback
 
