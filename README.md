@@ -10,20 +10,19 @@ CSChat is a real-time chat room application that allows multiple users to commun
 - Join and create chat rooms
 - View messages from other users
 
-## Installation Instructions
+## Quick Installation Instructions
+Download the [latest release files](https://github.com/RootCellar/chat-app/releases/tag/v1.0.0) and run them as standalone executables.
 
-### Prerequisites
-- [PLACEHOLDER: List any prerequisites]
-- [PLACEHOLDER: Specify any package managers required, e.g., npm, pip, etc.]
+## Build Instructions
 
-### Clone the Repository
+### Install Pyinstaller
 ```
-git clone [PLACEHOLDER: Repository URL]
+python3 -m pip install pyinstaller
 ```
 
-### Install Dependencies
+### Build
 ```
-[PLACEHOLDER: Command to install dependencies, e.g., npm install]
+bin/build.sh
 ```
 
 ## Usage Instructions
@@ -32,7 +31,9 @@ git clone [PLACEHOLDER: Repository URL]
 To start the application, do the following:
 
 ```
-[PLACEHOLDER: Command to run the application]
+dist/server
+...
+dist/client
 ```
 
 ### Accessing the Application
