@@ -155,10 +155,7 @@ def display_join(root):
     join_button = tk.Button(welcome_window, text="Join", command=join_server(server_address, username))
     join_button.grid(row=2, column=0, sticky='n', pady=1)  # Directly below the title label
 
-def init(root):
-    display_join(root)
-
-if __name__ == "__main__":
+def init():
     root = tk.Tk()
     root.title("CSChat")
     font.nametofont("TkDefaultFont").configure(
@@ -172,5 +169,8 @@ if __name__ == "__main__":
     root.geometry("640x480")
     root.resizable(True, True)
     root.eval('tk::PlaceWindow . center')
-    init(root)
+    display_join(root)
     root.mainloop()
+
+if __name__ == "__main__":
+    init()
