@@ -89,7 +89,7 @@ class Client(object):
     def chat(self, message):
         if self.is_connected() is False:
             return
-        self.socket.write(MessageType.CHAT_MESSAGE.value, message)
+        self.write(MessageType.CHAT_MESSAGE.value, message)
 
     def write(self, code, message):
         if self.is_connected() is False:
