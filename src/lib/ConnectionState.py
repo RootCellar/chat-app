@@ -3,5 +3,6 @@ from enum import Enum
 
 class ConnectionState(Enum):
     INITIATED = 0
-    SEND_USERNAME = 1
-    CHATTING = 2
+    ENCRYPT_CONNECTION = 1
+    SEND_USERNAME = 2
+    CHATTING = 3
