@@ -33,16 +33,22 @@ def message_from_bytes(data):
     return message
 
 def message_to_bytes(code, data):
-    if type(data) is str:
-        message_bytes = data.encode("utf-8")
-    elif type(data) is int:
-        message_bytes = int.to_bytes(data, length=4, byteorder='big')
-    else:
-        raise NotImplementedError
+    message_bytes = encode_as_bytes(data)
 
     msgLen = len(message_bytes)
     message_bytes = int.to_bytes(msgLen, length=4, byteorder='big') + int.to_bytes(code, length=4, byteorder='big') + message_bytes
 
+    return message_bytes
+
+def encode_as_bytes(data):
+    if type(data) is str:
+        message_bytes = data.encode("utf-8")
+    elif type(data) is int:
+        message_bytes = int.to_bytes(data, length=4, byteorder='big')
+    elif type(data) is bytes:
+        message_bytes = data
+    else:
+        raise NotImplementedError(type(data))
     return message_bytes
 
 class InetMessage(object):
