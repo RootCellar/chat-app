@@ -1,5 +1,7 @@
 import sys
 
+from nacl.public import PublicKey
+
 from ..lib import SocketHandler
 from ..lib import ServerSocket
 from ..lib.Debug import debug
@@ -26,7 +28,7 @@ class ChatServer(object):
         socket = self.serv.accept()
         if socket is not None:
             client = User.User(socket)
-            self.change_state(client, ConnectionState.SEND_USERNAME)
+            self.change_state(client, ConnectionState.ENCRYPT_CONNECTION)
             self.clients.append(client)
         return socket
 
@@ -57,6 +59,12 @@ class ChatServer(object):
                     if client.state == ConnectionState.SEND_USERNAME:
                         self.change_state(client, ConnectionState.CHATTING)
                         self.broadcast_message(client.username + " has joined the chat")
+                elif inetMessage.get_code() == MessageType.PUBLIC_KEY.value:
+                    self.log("Received public encryption key from client")
+                    key = PublicKey(inetMessage.get_message())
+                    client.encrypt(key)
+                    if client.state == ConnectionState.ENCRYPT_CONNECTION:
+                        self.change_state(client, ConnectionState.SEND_USERNAME)
 
     def broadcast_message(self, message):
         self.log("Broadcast: " + message)

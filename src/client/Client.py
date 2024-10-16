@@ -1,5 +1,6 @@
 
-import tkinter
+import nacl.utils
+from nacl.public import PrivateKey, PublicKey, Box
 
 from ..lib import SocketHandler
 from ..lib import InetMessage
@@ -62,7 +63,7 @@ class Client(object):
             self.disconnect()
             return None
 
-        message = self.socket.read()
+        message = self.read_message()
 
         if message is None:
             return None
@@ -70,6 +71,9 @@ class Client(object):
         self.log("Received message with code " + str(message.get_code()))
         if message.get_code() == MessageType.CHAT_MESSAGE.value:
             return message
+        elif message.get_code() == MessageType.PUBLIC_KEY.value:
+            if self.connection_encrypted is True:
+                self.enc_box = Box(self.private_key, PublicKey(message.get_message()))
         elif message.get_code() == MessageType.CONN_STATE.value:
             data = message.get_message()
             if len(data) != 4:
@@ -83,6 +87,11 @@ class Client(object):
             if self.server_state == ConnectionState.SEND_USERNAME.value:
                 self.log("Server needs username. Sending username to server...")
                 self.write(MessageType.USERNAME.value, self.username)
+            elif self.server_state == ConnectionState.ENCRYPT_CONNECTION.value:
+                self.log("Encrypting connection...")
+                self.private_key = PrivateKey.generate()
+                self.write(MessageType.PUBLIC_KEY.value, self.private_key.public_key.encode())
+                self.connection_encrypted = True
 
         return None
 
@@ -94,7 +103,16 @@ class Client(object):
     def write(self, code, message):
         if self.is_connected() is False:
             return
+        if self.enc_box is not None:
+            message = bytes(self.enc_box.encrypt(InetMessage.encode_as_bytes(message)))
         self.socket.write(code, message)
+
+    def read_message(self):
+        message = self.socket.read()
+        if message is not None and self.enc_box is not None:
+            message_bytes = self.enc_box.decrypt(message.get_message())
+            message.message_bytes = message_bytes
+        return message
 
 if __name__ == "__main__":
     client = Client()
