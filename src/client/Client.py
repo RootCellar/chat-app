@@ -13,21 +13,26 @@ from ..lib.ConnectionState import ConnectionState
 class Client(object):
 
     def __init__(self):
-        self.serverhost = None
-        self.serverport = None
-        self.socket = None
-        self.state = None
-
-        self.username = None
-        self.server_state = None
+        self.reset()
 
     def log(self, output):
         debug("[CLIENT] " + output)
+
+    def reset(self):
+        self.socket = None
+        self.serverhost = None
+        self.serverport = None
+        self.state = None
+        self.server_state = None
+        self.enc_box = None
+        self.private_key = None
+        self.connection_encrypted = False
 
     def set_username(self, username):
         self.username = username
 
     def connect(self, host, port):
+        self.reset()
         self.socket = SocketHandler.SocketHandler()
 
         try:
@@ -39,17 +44,11 @@ class Client(object):
         self.serverhost = host
         self.serverport = port
         self.state = ConnectionState.INITIATED
-        self.server_state = None
         return True
 
     def disconnect(self):
         self.socket.close()
-        self.socket = None
-
-        self.serverhost = None
-        self.serverport = None
-        self.state = None
-        self.server_state = None
+        self.reset()
 
     def is_connected(self):
         if self.socket is None:
