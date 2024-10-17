@@ -23,7 +23,7 @@ class SocketHandler(object):
             self.port = port
 
     def log(self, output):
-        Debug.debug("[SOCKET HANDLER]" + output)
+        Debug.debug("[SOCKET HANDLER] " + output)
 
     def connect(self, host, port):
         self.host = host
