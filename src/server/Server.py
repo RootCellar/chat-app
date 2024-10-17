@@ -35,7 +35,7 @@ class ChatServer(object):
     def change_state(self, client, state):
         client.state = state
         client.send(MessageType.CONN_STATE.value, state.value)
-        self.log("Client state change to " + str(state.value))
+        self.log("Client state change to " + state.name)
 
     def handle_messages(self):
         for client in self.clients:

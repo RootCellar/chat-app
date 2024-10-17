@@ -8,8 +8,8 @@ from ..lib.Debug import debug
 
 import time
 
-from ..lib.MessageType import MessageType
-from ..lib.ConnectionState import ConnectionState
+from ..lib.MessageType import MessageType, message_type_from_code
+from ..lib.ConnectionState import ConnectionState, connection_state_from_code
 
 class Client(object):
 
@@ -68,7 +68,7 @@ class Client(object):
         if message is None:
             return None
 
-        self.log("Received message with code " + str(message.get_code()))
+        self.log("Received " + message_type_from_code(message.get_code()).name + " message")
         if message.get_code() == MessageType.CHAT_MESSAGE.value:
             return message
         elif message.get_code() == MessageType.PUBLIC_KEY.value:
@@ -82,7 +82,7 @@ class Client(object):
                 self.disconnect()
                 return None
             self.server_state = int.from_bytes(data, byteorder='big')
-            self.log("CONN_STATE: " + str(self.server_state))
+            self.log("CONN_STATE: " + connection_state_from_code(self.server_state).name)
 
             if self.server_state == ConnectionState.SEND_USERNAME.value:
                 self.log("Server needs username. Sending username to server...")
