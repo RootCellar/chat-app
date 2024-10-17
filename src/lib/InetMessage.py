@@ -21,7 +21,7 @@ def message_from_bytes(data):
     length = int.from_bytes(data[0:4], byteorder='big')
     code = int.from_bytes(data[4:8], byteorder='big')
 
-    if length < 1 or code < 0:
+    if length < 0 or code < 0:
         return InetMessage(8, -1, b'')
 
     message = data[8:(8 + length)]
