@@ -16,6 +16,8 @@ from ..lib.ConnectionState import ConnectionState
 import tkinter as tk
 from tkinter import simpledialog, font
 
+import sys
+
 class ChatConnection:
     client = Client()
     username = None
@@ -88,7 +90,7 @@ def display_chat(root, connection):
     def get_incoming_message_loop():
         if connection.client.is_connected() is False:
             print('Client disconnected')
-            exit(0)
+            sys.exit(0)
 
         message = connection.get_next_message()
         if message is not None:
