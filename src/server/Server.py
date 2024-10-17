@@ -19,6 +19,7 @@ class ChatServer(object):
         self.port = port
         self.serv = ServerSocket.ServerSocket()
         self.serv.listen(port)
+        self.max_clients = 100
         self.clients = []
 
     def log(self, output):
@@ -28,6 +29,10 @@ class ChatServer(object):
         socket = self.serv.accept()
         if socket is not None:
             client = User.User(socket)
+            if len(self.clients) >= self.max_clients:
+                client.send(MessageType.REFUSED.value, b'')
+                client.disconnect()
+                return
             self.change_state(client, ConnectionState.ENCRYPT_CONNECTION)
             self.clients.append(client)
         return socket

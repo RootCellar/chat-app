@@ -16,6 +16,9 @@ class User(object):
     def is_connected(self):
         return self.sockethandler.is_connected()
 
+    def disconnect(self):
+        self.sockethandler.close()
+
     def encrypt(self, public_key):
         self.private_key = PrivateKey.generate()
         self.send(MessageType.PUBLIC_KEY.value, self.private_key.public_key.encode())

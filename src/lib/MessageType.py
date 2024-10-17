@@ -6,6 +6,7 @@ class MessageType(Enum):
     USERNAME = 1
     CONN_STATE = 2
     PUBLIC_KEY = 3
+    REFUSED = 4
 
 def message_type_from_code(code):
     for i in list(MessageType):
