@@ -35,6 +35,7 @@ class SocketHandler(object):
         self.socket.connect((self.host, self.port))
         self.socket.setblocking(0)
         self.connected = True
+        self.buffer = b''
 
     def is_connected(self):
         return self.connected
@@ -44,6 +45,7 @@ class SocketHandler(object):
         self.connected = False
         self.host = None
         self.port = None
+        self.buffer = b''
 
         try:
             self.socket.shutdown(1)
