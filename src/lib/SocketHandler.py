@@ -23,7 +23,7 @@ class SocketHandler(object):
             self.port = port
 
     def log(self, output):
-        Debug.debug("[SOCKET HANDLER]" + output)
+        Debug.debug("[SOCKET HANDLER] " + output)
 
     def connect(self, host, port):
         self.host = host
@@ -35,6 +35,7 @@ class SocketHandler(object):
         self.socket.connect((self.host, self.port))
         self.socket.setblocking(0)
         self.connected = True
+        self.buffer = b''
 
     def is_connected(self):
         return self.connected
@@ -44,6 +45,7 @@ class SocketHandler(object):
         self.connected = False
         self.host = None
         self.port = None
+        self.buffer = b''
 
         try:
             self.socket.shutdown(1)
@@ -71,6 +73,7 @@ class SocketHandler(object):
         if len(self.buffer) > 16384:
             self.log("Read buffer overflow")
             self.close()
+            return None
 
         inetMessage = InetMessage.message_from_bytes(self.buffer)
         if inetMessage is not None:
