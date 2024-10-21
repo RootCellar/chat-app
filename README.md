@@ -20,7 +20,12 @@ Download the [latest release files](https://github.com/RootCellar/chat-app/relea
 python3 -m pip install pyinstaller
 ```
 
-### Build
+### Build (Windows)
+```
+.\bin\build.bat
+```
+
+### Build (Linx)
 ```
 bin/build.sh
 ```
@@ -28,7 +33,7 @@ bin/build.sh
 ## Usage Instructions
 
 ### Running the Application
-To start the application, do the following:
+To start the application, either open the executable file or enter the following commands in a terminal:
 
 ```
 dist/server
